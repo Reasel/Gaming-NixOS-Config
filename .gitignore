@@ -1,0 +1,2 @@
+# Ignore hardware configuration as it may be auto-generated
+hardware-configuration.nix
