@@ -35,7 +35,7 @@
           programs.bakkesmod = {
             enable = true;
             plugins = with pkgs.bakkesmod-plugins; [  # Customize plugins as needed
-              rocketstats
+              IngameRank
               {
                 plugin = deja-vu-player-tracking;
                 extraConfig = ''
@@ -46,7 +46,7 @@
             ];
             config = {  # Customize config options as needed (see repo docs for all options)
               gui.scale = 1.0;
-              console.enabled = true;
+              console.enabled = false;
               ranked.showRanks = true;
             };
           };
