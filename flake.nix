@@ -45,9 +45,15 @@
               }
             ];
             config = {  # Customize config options as needed (see repo docs for all options)
-              console.enabled = true;
+              console.enabled = false;
               ranked.showRanks = true;
               ranked.autoGG = true;
+
+              extraConfig = {
+                "bind \"NumPadOne\"" = "queue";
+                "bind \"NumPadTwo\"" = "load_freeplay";
+                "bind \"Subtract\"" = "cancel_queue";
+              };
 
             };
           };
