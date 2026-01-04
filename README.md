@@ -13,17 +13,8 @@ This repository contains the NixOS configuration for managing a desktop system u
 To update flake inputs and rebuild the system:
 
 ```bash
-# Update all flake inputs
-nix flake update
-
 # Rebuild and switch to the new configuration
 sudo nixos-rebuild switch --flake ~/nixos
-```
-
-To rebuild without switching (for testing):
-
-```bash
-sudo nixos-rebuild build --flake ~/nixos
 ```
 
 To check the configuration for syntax errors:
