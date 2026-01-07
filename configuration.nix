@@ -120,7 +120,6 @@
       kdePackages.kcalc
       vscode
       teams-for-linux
-      jetbrains.idea-oss
 
       # CLI Tools
       pciutils
