@@ -1,12 +1,8 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, inputs, ... }:
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
     ];
 
@@ -14,20 +10,10 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
+  # Network and defaults
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
-
-  # Set your time zone.
   time.timeZone = "America/Los_Angeles";
-
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
@@ -42,15 +28,11 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
   services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  # Make it so that the autoLogin happens for my deafult account.
+  # Make it so that the autoLogin happens for my default account.
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "reasel";
 
@@ -71,31 +53,19 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account.
   users.users.reasel = {
     isNormalUser = true;
     description = "Tanner Mjelde";
-    extraGroups = [ "networkmanager" "wheel" "ydotool" ];
+    extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       kdePackages.kate
-    #  thunderbird
     ];
   };
 
-  # /etc/nixos/configuration.nix (add or edit)
   services.xserver.videoDrivers = [ "nvidia" ];
-  # Recommended OpenGL options
   hardware.graphics  = {
     enable = true;
   };
@@ -103,20 +73,12 @@
   hardware.bluetooth.enable = true;
 
   hardware.nvidia = {
-    # Use the recommended production driver (>= 560)
     package = config.boot.kernelPackages.nvidiaPackages.production;
-
-    # Enable Kernel Mode Setting
     modesetting.enable = true;
-
-    # Use the open-source kernel modules (recommended for Turing+)
     open = true;
-
-    # Enable 32-bit userspace libraries for Steam/Proton
     powerManagement.enable = false;
     nvidiaSettings = true;
   };
-
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -131,28 +93,17 @@
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
     gamescopeSession.enable = true;
   };
 
   programs.gamescope.enable = true;
   programs.gamemode.enable = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
-      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #  wget
-
       # Gaming Stuff
-      heroic bolt-launcher mangohud
-      protonup-ng
-      protontricks
-      gamemode
-      prismlauncher
-      wine
-      winetricks
-      # sunshine there are some issues with this so removing for now.
+      heroic bolt-launcher prismlauncher
+      protonup-ng protontricks wine winetricks gamemode
 
       # Comms and Media
       discord
@@ -167,6 +118,9 @@
       ffmpeg
       vlc
       kdePackages.kcalc
+      vscode
+      teams-for-linux
+      jetbrains.idea-oss
 
       # CLI Tools
       pciutils
@@ -179,10 +133,9 @@
       unzip
       tldr
 
-      # Other things?
+      # Dev things?
       cargo
       nodejs
-      killall
   ];
 
 
@@ -195,11 +148,6 @@
       enable = true;
     };
 
-    # Sunshine service
-    sunshine = {
-      enable = true;
-      openFirewall = true;
-    };
   };
 
   # ZSH Configuration
@@ -212,59 +160,20 @@
     };
   };
 
-  # OBS setup
-  programs.obs-studio = {
-    enable = true;
-
-    # optional Nvidia hardware acceleration
-    package = (
-      pkgs.obs-studio.override {
-        cudaSupport = true;
-      }
-    );
-
-    plugins = with pkgs.obs-studio-plugins; [
-      wlrobs
-      obs-backgroundremoval
-      obs-pipewire-audio-capture
-      obs-vaapi #optional AMD hardware acceleration
-      obs-gstreamer
-      obs-vkcapture
-    ];
-  };
-
   # Sets ZSH as default shell
   users.defaultUserShell = pkgs.zsh;
   users.users.root.shell = pkgs.zsh;
 
   boot.kernelModules = [ "uinput" ];
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/sunshine 0755 root root -"
-  ];
-
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
   };
 
-  # List services that you want to enable:
-
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.11"; # Did you read the comment?
+  system.stateVersion = "25.11";
 }
 
 
