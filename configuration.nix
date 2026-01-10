@@ -120,6 +120,7 @@
       kdePackages.kcalc
       vscode
       teams-for-linux
+      zoom-us
 
       # CLI Tools
       pciutils
