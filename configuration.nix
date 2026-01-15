@@ -10,6 +10,22 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Enable NFS kernel modules (nfs/nfs4) and rpcbind service (required for NFS client).
+  boot.supportedFilesystems = [ "nfs" "nfs4" ];
+  services.rpcbind.enable = true;
+
+  fileSystems."/mnt/nas" = {
+    device = "192.168.1.53:/volume1/Media";
+    fsType = "nfs";
+    options = [
+      "nfsvers=4"
+      "x-systemd.automount"
+      "noauto"
+      "x-systemd.idle-timeout=60"
+      "noatime"
+    ];
+  };
+
   # Network and defaults
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
@@ -28,6 +44,7 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  virtualisation.docker.enable = true;
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -59,7 +76,7 @@
   users.users.reasel = {
     isNormalUser = true;
     description = "Tanner Mjelde";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -82,6 +99,9 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  # Ensure Tmux is installed
+  programs.tmux.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -121,6 +141,7 @@
       vscode
       teams-for-linux
       zoom-us
+      makemkv
 
       # CLI Tools
       pciutils
@@ -136,6 +157,11 @@
       # Dev things?
       cargo
       nodejs
+      python313
+      docker
+      docker-compose
+      chromium
+
   ];
 
 
