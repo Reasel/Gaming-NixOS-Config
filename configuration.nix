@@ -14,7 +14,7 @@
   boot.supportedFilesystems = [ "nfs" "nfs4" ];
   services.rpcbind.enable = true;
 
-  fileSystems."/mnt/nas" = {
+  fileSystems."/mnt/MJELDE-NAS" = {
     device = "192.168.1.53:/volume1/Media";
     fsType = "nfs";
     options = [
@@ -100,11 +100,15 @@
   # Install firefox.
   programs.firefox.enable = true;
 
-  # Ensure Tmux is installed
-  programs.tmux.enable = true;
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  programs.tmux = {
+    enable = true;
+    extraConfig = ''
+      set -g mouse on
+    '';
+  };
 
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
@@ -148,7 +152,6 @@
       yad
       zenity
       htop
-      tmux
       zsh
       git
       unzip
