@@ -4,6 +4,7 @@
   imports =
     [
       ./hardware-configuration.nix
+      inputs.crossmacro.nixosModules.default
     ];
 
   # Bootloader.
@@ -46,8 +47,16 @@
 
   virtualisation.docker.enable = true;
   services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+
+  services.displayManager.sddm = {
+    enable = true;  # Ensure SDDM is enabled
+    settings = {
+      General = {
+        Numlock = "on";  # Enable NumLock in SDDM greeter
+      };
+    };
+  };
 
   # Make it so that the autoLogin happens for my default account.
   services.displayManager.autoLogin.enable = true;
@@ -76,7 +85,7 @@
   users.users.reasel = {
     isNormalUser = true;
     description = "Tanner Mjelde";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "cdrom" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -146,6 +155,9 @@
       teams-for-linux
       zoom-us
       makemkv
+      libreoffice-qt-fresh
+      calibre
+      conky
 
       # CLI Tools
       pciutils
@@ -189,11 +201,16 @@
     };
   };
 
+  programs.crossmacro = {
+    enable = true;
+    users = [ "reasel" ];  # Add users who should access CrossMacro
+  };
+
   # Sets ZSH as default shell
   users.defaultUserShell = pkgs.zsh;
   users.users.root.shell = pkgs.zsh;
 
-  boot.kernelModules = [ "uinput" ];
+  boot.kernelModules = [ "uinput" "sg" ];
 
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
