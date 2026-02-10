@@ -7,6 +7,15 @@
       inputs.crossmacro.nixosModules.default
     ];
 
+  # Docker configuration
+  virtualisation.docker = {
+    enable = true;
+    autoPrune = {
+      enable = true;
+      dates = "weekly";
+    };
+  };
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -22,8 +31,10 @@
       "nfsvers=4"
       "x-systemd.automount"
       "noauto"
+      "rw"
       "x-systemd.idle-timeout=60"
       "noatime"
+      "anonuid=1000"
     ];
   };
 
@@ -45,7 +56,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  virtualisation.docker.enable = true;
   services.xserver.enable = true;
   services.desktopManager.plasma6.enable = true;
 
@@ -79,6 +89,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    jack.enable = true;
   };
 
   # Define a user account.
@@ -142,6 +153,7 @@
       discord
       spotify
       signal-desktop
+      easyeffects
 
       # Utility
       obsidian
@@ -158,6 +170,7 @@
       libreoffice-qt-fresh
       calibre
       conky
+      losslesscut-bin
 
       # CLI Tools
       pciutils
@@ -168,6 +181,7 @@
       git
       unzip
       tldr
+      scrcpy
 
       # Dev things?
       cargo
