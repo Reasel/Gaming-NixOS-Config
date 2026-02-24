@@ -1,19 +1,23 @@
 # flake.nix
 {
    inputs = {
-     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-     home-manager = {
-       url = "github:nix-community/home-manager";
-       inputs.nixpkgs.follows = "nixpkgs";
-     };
-     bakkesmod-nix = {
-       url = "github:AddG0/bakkesmod-nix";
-       inputs.nixpkgs.follows = "nixpkgs";
-     };
-     crossmacro.url = "github:alper-han/CrossMacro";
-   };
+      nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+      home-manager = {
+        url = "github:nix-community/home-manager";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+      bakkesmod-nix = {
+        url = "github:AddG0/bakkesmod-nix";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+      crossmacro.url = "github:alper-han/CrossMacro";
+      claude-code-nix = {
+        url = "github:sadjow/claude-code-nix";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+    };
 
-   outputs = {self, nixpkgs, home-manager, bakkesmod-nix, crossmacro, ...}@inputs: {
+   outputs = {self, nixpkgs, home-manager, bakkesmod-nix, crossmacro, claude-code-nix, ...}@inputs: {
   # set up for NixOS
   nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
     specialArgs = {inherit inputs;};

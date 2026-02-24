@@ -68,6 +68,10 @@
     };
   };
 
+  # Force Plasma to use X11 — needed for Sunshine game streaming
+  # (Plasma 6 defaults to Wayland, but Sunshine capture works best on X11 with NVIDIA)
+  services.displayManager.defaultSession = "plasmax11";
+
   # Make it so that the autoLogin happens for my default account.
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "reasel";
@@ -96,7 +100,7 @@
   users.users.reasel = {
     isNormalUser = true;
     description = "Tanner Mjelde";
-    extraGroups = [ "networkmanager" "wheel" "docker" "cdrom" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "cdrom" "input" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -182,6 +186,7 @@
       unzip
       tldr
       scrcpy
+      gh
 
       # Dev things?
       cargo
@@ -190,17 +195,31 @@
       docker
       docker-compose
       chromium
+      jetbrains.idea
+      jetbrains.idea-oss
 
   ];
 
 
-  nixpkgs.overlays = [ inputs.bakkesmod-nix.overlays.default ];
+  nixpkgs.overlays = [
+      inputs.bakkesmod-nix.overlays.default
+      (final: prev: {
+        claude-code = inputs.claude-code-nix.packages.${prev.system}.default;
+      })
+    ];
 
    # Services
   services = {
     # Enable flatpak support
     flatpak = {
       enable = true;
+    };
+
+    # Sunshine game streaming (Moonlight host)
+    sunshine = {
+      enable = true;
+      autoStart = true;
+      openFirewall = true;
     };
 
   };
@@ -220,6 +239,23 @@
     users = [ "reasel" ];  # Add users who should access CrossMacro
   };
 
+  # Enable nix-ld for running dynamically linked binaries (e.g., externally downloaded JDKs)
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib
+      zlib
+      # Java often needs these:
+      xorg.libX11
+      xorg.libXext
+      xorg.libXi
+      xorg.libXrender
+      xorg.libXtst
+      freetype
+      fontconfig
+    ];
+  };
+
   # Sets ZSH as default shell
   users.defaultUserShell = pkgs.zsh;
   users.users.root.shell = pkgs.zsh;
@@ -229,6 +265,9 @@
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
   };
+
+  # Sunshine needs access to NVIDIA encoder libraries for NVENC hardware encoding
+  systemd.user.services.sunshine.environment.LD_LIBRARY_PATH = "/run/opengl-driver/lib";
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
